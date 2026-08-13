@@ -47,6 +47,7 @@ appsettings.*.local.json
 *.env
 .env
 .env.*
+!.env.example
 secrets.json
 
 ## OS

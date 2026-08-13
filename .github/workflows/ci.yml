@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-unit-test:
+    name: Build & unit test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Unit tests
+        run: dotnet test tests/FarmerOps.UnitTests --no-build --configuration Release --logger "trx;LogFileName=unit-tests.trx" --results-directory ./test-results
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: ./test-results
+
+  integration-test:
+    name: Integration tests (Testcontainers + real SQL Server)
+    runs-on: ubuntu-latest
+    needs: build-and-unit-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      # Testcontainers spins up a real mcr.microsoft.com/mssql/server container for these tests;
+      # the ubuntu-latest runner ships Docker pre-installed, so no extra setup is needed.
+      - name: Integration tests
+        run: dotnet test tests/FarmerOps.IntegrationTests --configuration Release --logger "trx;LogFileName=integration-tests.trx" --results-directory ./test-results
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: ./test-results
+
+  docker-build:
+    name: Docker image build check
+    runs-on: ubuntu-latest
+    needs: build-and-unit-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Api image
+        run: docker build -f src/FarmerOps.Api/Dockerfile -t farmerops-api:ci .
+
+      - name: Build Worker image
+        run: docker build -f src/FarmerOps.Worker/Dockerfile -t farmerops-worker:ci .
