@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FarmerOps.Api/FarmerOps.Api.csproj" />
+    <Project Path="src/FarmerOps.Application/FarmerOps.Application.csproj" />
+    <Project Path="src/FarmerOps.Domain/FarmerOps.Domain.csproj" />
+    <Project Path="src/FarmerOps.Infrastructure/FarmerOps.Infrastructure.csproj" />
+    <Project Path="src/FarmerOps.Worker/FarmerOps.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FarmerOps.IntegrationTests/FarmerOps.IntegrationTests.csproj" />
+    <Project Path="tests/FarmerOps.UnitTests/FarmerOps.UnitTests.csproj" />
+  </Folder>
+</Solution>
