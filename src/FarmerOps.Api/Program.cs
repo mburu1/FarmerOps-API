@@ -33,14 +33,19 @@ builder.Services.AddOpenApi(options =>
 });
 
 // ---- JWT Authentication ----
-var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
-    ?? throw new InvalidOperationException("Jwt configuration section is missing.");
-
+// TokenValidationParameters is built from IOptions<JwtSettings> (resolved lazily, at request
+// time) rather than an eager builder.Configuration.Get<JwtSettings>() snapshot. WebApplicationFactory
+// in integration tests layers its own config source onto the builder as part of Build(), which runs
+// AFTER this line executes — an eager read here would sign with one key and validate with another.
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddJwtBearer();
+
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<Microsoft.Extensions.Options.IOptions<JwtSettings>>((bearerOptions, jwtSettingsOptions) =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        var jwtSettings = jwtSettingsOptions.Value;
+        bearerOptions.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,

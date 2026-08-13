@@ -48,7 +48,11 @@ public class FarmersApiTests(CustomWebApplicationFactory factory)
     [Fact]
     public async Task GetFarmers_WithoutToken_ReturnsUnauthorized()
     {
-        var response = await new HttpClient { BaseAddress = _client.BaseAddress }.GetAsync("/api/v1/farmers");
+        // A plain `new HttpClient()` would make a real network call; CreateClient() wires up the
+        // TestServer's in-memory handler so this actually hits the app under test.
+        using var anonymousClient = factory.CreateClient();
+
+        var response = await anonymousClient.GetAsync("/api/v1/farmers");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
