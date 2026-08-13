@@ -38,7 +38,11 @@ public sealed class LoginCommandHandler(
         var refreshToken = tokenService.GenerateRefreshToken();
         var settings = jwtSettings.Value;
         var refreshExpiresAtUtc = DateTime.UtcNow.AddDays(settings.RefreshTokenDays);
-        user.IssueRefreshToken(refreshToken, refreshExpiresAtUtc);
+        var refreshTokenEntity = user.IssueRefreshToken(refreshToken, refreshExpiresAtUtc);
+
+        // user.RefreshTokens wasn't loaded, so EF has no baseline to detect the new item via the
+        // navigation alone — track it explicitly or SaveChanges tries to UPDATE a row that was never inserted.
+        db.RefreshTokens.Add(refreshTokenEntity);
 
         await db.SaveChangesAsync(cancellationToken);
 

@@ -43,7 +43,8 @@ public sealed class RefreshTokenCommandHandler(
         var settings = jwtSettings.Value;
         var newRefreshToken = tokenService.GenerateRefreshToken();
         existingToken.Revoke(newRefreshToken);
-        user.IssueRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(settings.RefreshTokenDays));
+        var newRefreshTokenEntity = user.IssueRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(settings.RefreshTokenDays));
+        db.RefreshTokens.Add(newRefreshTokenEntity);
 
         var accessToken = tokenService.GenerateAccessToken(user);
         await db.SaveChangesAsync(cancellationToken);

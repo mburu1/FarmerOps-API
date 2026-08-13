@@ -1,4 +1,5 @@
 using System.Reflection;
+using FarmerOps.Application.Alerts.Services;
 using FarmerOps.Application.Common.Behaviors;
 using FarmerOps.Domain.Rules;
 using FluentValidation;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(assembly);
 
         services.AddSingleton(LoanEligibilityEngine.CreateDefault());
+        services.AddScoped<AlertDispatchService>();
 
         return services;
     }

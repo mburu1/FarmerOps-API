@@ -45,9 +45,10 @@ public sealed class RegisterCommandHandler(
         var refreshToken = tokenService.GenerateRefreshToken();
         var settings = jwtSettings.Value;
         var refreshExpiresAtUtc = DateTime.UtcNow.AddDays(settings.RefreshTokenDays);
-        user.IssueRefreshToken(refreshToken, refreshExpiresAtUtc);
+        var refreshTokenEntity = user.IssueRefreshToken(refreshToken, refreshExpiresAtUtc);
 
         db.Users.Add(user);
+        db.RefreshTokens.Add(refreshTokenEntity);
         await db.SaveChangesAsync(cancellationToken);
 
         var accessExpiresAtUtc = DateTime.UtcNow.AddMinutes(settings.AccessTokenMinutes);
