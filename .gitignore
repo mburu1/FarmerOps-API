@@ -1,0 +1,61 @@
+## .NET
+bin/
+obj/
+out/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider / VS / VSCode
+.vs/
+.vscode/
+.idea/
+*.DotSettings.user
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+## Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+## EF Core
+**/Migrations/*.Designer.cs.bak
+
+## Secrets / local config
+appsettings.Development.json
+appsettings.*.local.json
+*.env
+.env
+.env.*
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Docker
+docker-compose.override.yml
+
+## Misc
+*.log
+*.tmp
